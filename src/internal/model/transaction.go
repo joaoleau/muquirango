@@ -5,24 +5,23 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-type EntryType string
+type TransactionType string
 
 const (
-	EntryTypePurchase EntryType = "PURCHASE"
-	EntryTypeIncome EntryType = "INCOME"
-	EntryTypeInvestment EntryType = "INVESTMENT"
+	TransactionTypePurchase TransactionType = "PURCHASE"
+	TransactionTypeIncome TransactionType = "INCOME"
+	TransactionTypeInvestment TransactionType = "INVESTMENT"
 )
 
-type Entry struct {
+type Transaction struct {
 	ID          string    `json:"id" dynamodbav:"id"`
-	UserID      string    `json:"user_id" dynamodbav:"user_id"`
-	Type        EntryType `json:"type" dynamodbav:"type"`
+	Type        TransactionType `json:"type" dynamodbav:"type"`
 	Description string    `json:"description" dynamodbav:"description"`
 	CreatedAt   time.Time `json:"created_at" dynamodbav:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" dynamodbav:"updated_at"`
 } 
 
-func (e Entry) GetKey() (map[string]types.AttributeValue) {
+func (e Transaction) GetKey() (map[string]types.AttributeValue) {
 	return map[string]types.AttributeValue{
 		"id": &types.AttributeValueMemberS{Value: e.ID},
 	}

@@ -1,13 +1,39 @@
 package handler
 
 import (
-	"encoding/base64"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
-	"github.com/aws/aws-lambda-go/events"
 )
+
+type ResponseBody struct {
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
+}
+
+func response(w http.ResponseWriter, status int, body ResponseBody) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(body)
+}
+
+func ResponseWithError(w http.ResponseWriter, status int, err error) {
+	response(w, status, ResponseBody{
+		Error:   err.Error(),
+	})
+}
+
+func ResponseWithMessage(w http.ResponseWriter, status int, message string) {
+	response(w, status, ResponseBody{
+		Message: message,
+	})
+}
+
+func ResponseWithData(w http.ResponseWriter, status int, data interface{}) {
+	response(w, status, ResponseBody{
+		Data:    data,
+	})
+}
 
 func Serialize[T any](obj T) ([]byte, error) {
 	var body []byte
@@ -19,47 +45,11 @@ func Serialize[T any](obj T) ([]byte, error) {
 	return body, nil
 }
 
-func Deserialize[T any](request events.APIGatewayProxyRequest) (*T, error) {
-	body := request.Body
-
-	if request.IsBase64Encoded {
-		decoded, err := base64.StdEncoding.DecodeString(body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode base64: %w", err)
-		}
-		body = string(decoded)
-	}
-
+func Deserialize[T any](r *http.Request) (*T, error) {
 	var t T
-	if body == "" {
-		return nil, errors.New("input is empty")
-	}
-	err := json.Unmarshal([]byte(body), &t)
-	if err != nil {
+	defer r.Body.Close()
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
 		return nil, err
 	}
 	return &t, nil
-}
-
-func ResponseWithError(status int, err error) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Body:       err.Error(),
-	}, nil
-}
-
-func ResponseWithMessage(status int, message string) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		StatusCode: status,
-		Headers: map[string]string{"Content-Type": "application/json"},
-		Body:       message,
-	}, nil
-}
-
-func ResponseWithSerialized(status int, data any) (events.APIGatewayProxyResponse, error) {
-	body, err := Serialize(data)
-	if err != nil {
-		return ResponseWithError(http.StatusInternalServerError, err)
-	}
-	return ResponseWithMessage(status, string(body))
 }

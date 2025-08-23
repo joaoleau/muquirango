@@ -23,7 +23,7 @@ func DynamoClient(ctx context.Context) (*dynamodb.Client, string) {
 	customResolver := aws.EndpointResolverWithOptionsFunc(
 		func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 			return aws.Endpoint{
-				URL:           "http://host.docker.internal:4566",
+				URL:           "http://host.docker.internal:8000",
 				SigningRegion: "sa-east-1",
 			}, nil
 		})

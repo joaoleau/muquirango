@@ -20,11 +20,11 @@ Resources:
         EntryByID:
           Type: Api
           Properties:
-            Path: /entry/{id}
+            Path: /api/transaction/{id}
             Method: ANY
 
         Entry:
           Type: Api
           Properties:
-            Path: /entry
+            Path: /api/transaction
             Method: ANY
