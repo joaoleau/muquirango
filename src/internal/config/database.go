@@ -2,14 +2,15 @@ package config
 
 import (
 	"context"
-	"log"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/joaoleau/muquirango/internal/config/logger"
 )
 
 var client *dynamodb.Client
-var tableName string = "GODynamo" 
+var tableName string = "Muquirango" 
 
 // func init() {
 // 	cfg, err := config.LoadDefaultConfig(context.Background())
@@ -33,7 +34,7 @@ func DynamoClient(ctx context.Context) (*dynamodb.Client, string) {
 		config.WithEndpointResolverWithOptions(customResolver),
 	)
 	if err != nil {
-		log.Fatalf("failed to load database: %v", err)
+		logger.Error("failed to load database: ", err)
 	}
 
 	client = dynamodb.NewFromConfig(cfg)

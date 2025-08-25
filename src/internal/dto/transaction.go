@@ -6,5 +6,7 @@ import (
 
 type CreateTransactionInput struct {
 	Type        model.TransactionType `json:"type"`
-	Description string          	`json:"description"`
+	Title       string                `json:"title"`
+	Description *string               `json:"description,omitempty"`
+	Amount      int                   `json:"amount"`
 }

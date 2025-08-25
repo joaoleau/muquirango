@@ -22,6 +22,7 @@ func RegisterRoutes(r *chi.Mux, repos *Repositories) () {
 		r.Route("/transaction", func(r chi.Router) {
 			r.Get("/", transactionHandler.ListTransactions)
 			r.Post("/", transactionHandler.NewTransaction)
+			r.Put("/{id}", transactionHandler.UpdateTransactionByID)
 			r.Get("/{id}", transactionHandler.GetTransactionByID)
 			r.Delete("/{id}", transactionHandler.DeleteTransactionByID)
 		})
